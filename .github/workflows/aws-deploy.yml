@@ -1,0 +1,37 @@
+name: Deploy to AWS S3
+
+on:
+  push:
+    branches:
+      - main # Or your default branch
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest # Or ubuntu-latest, using windows to match local dev
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Vite App
+        run: npm run build
+
+      - name: Sync to AWS S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-east-1' # Must match Terraform region
+        run: |
+          # Replace 'YOUR_BUCKET_NAME_HERE' with the bucket name output from terraform
+          # e.g., aws s3 sync dist/ s3://devops-training-site-a1b2c3d4 --delete
+          echo "Please ensure you have run 'terraform apply' to create your bucket."
+          echo "Uncomment and update the line below with your bucket name to enable the sync:"
+          # aws s3 sync dist/ s3://YOUR_BUCKET_NAME_HERE --delete
